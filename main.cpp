@@ -1,3 +1,7 @@
+#include <filesystem>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <opencv2/opencv.hpp>   // Include OpenCV API
 
@@ -28,6 +32,7 @@ int main(int argc, char *argv[]) try {
   using namespace cv;
   const auto window_name = "Display Image";
   namedWindow(window_name, WINDOW_AUTOSIZE);
+  int count = 0;
 
   while (true) {
     // Wait for the next set of frames from the camera
@@ -48,10 +53,25 @@ int main(int argc, char *argv[]) try {
               Mat::AUTO_STEP);
     Mat image1(Size(w, h), CV_8UC1, (void *)fisheye_frame1.get_data(),
               Mat::AUTO_STEP);
-    cv::hconcat(image0, image1, image0);
+    Mat img_show;
+    cv::hconcat(image0, image1, img_show);
     // Update the window with new data
-    imshow(window_name, image0);
-    waitKey(1);
+    imshow(window_name, img_show);
+    char key = (char) cv::waitKey(10);   // explicit cast
+    if (key == 27) break;                // break if `esc' key was pressed. 
+    if (key == ' '){
+      if(!std::filesystem::exists("imgs")){
+        std::filesystem::create_directories("imgs/cam0");
+        std::filesystem::create_directories("imgs/cam1");
+      }
+      std::stringstream ss;
+      std::string s;
+      ss << std::setfill('0') << std::setw(4) << count++;
+      ss >> s;
+      std::cout << s << std::endl;
+      imwrite("imgs/cam0/"+s+".png", image0);
+      imwrite("imgs/cam1/"+s+".png", image1);
+    }
   }
 
   return EXIT_SUCCESS;

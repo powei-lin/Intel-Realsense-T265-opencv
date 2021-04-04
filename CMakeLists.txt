@@ -7,7 +7,7 @@ find_package(realsense2 REQUIRED)
 find_package(OpenCV REQUIRED)
 
 # Enable C++11
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 add_executable(main main.cpp)
